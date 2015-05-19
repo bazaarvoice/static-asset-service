@@ -11,34 +11,58 @@ If your application requires a resource that is supported by the SDK, you can us
 Your application is responsible for providing a script loader that the SDK can use; the scriptLoader should be a function that takes a script URL and a node-style callback as its arguments.
 
 ```js
+// You must provide a script loader to the SDK; chances are good
+// that your application already has one, but if not, you can use
+// the next five lines.
+function getScript (url) {
+  var s = document.createElement('script');
+  s.src = url;
+  document.body.appendChild(s);
+}
+
 // Load the SDK and provide it with a script loader.
-var staticAssets = require('static-assets/sdk')(scriptLoader);
+var staticAssets = require('static-assets/sdk')({
+  loader : getScript,
 
-// You must set a namespace for the SDK; the SDK will need to
-// create window[NAMESPACE]._staticAssetRegistry, and will add
-// properties and methods there.
-staticAssets.setNamespace('BV');
+  // You must set a namespace for the SDK; the SDK will need to
+  // create window[NAMESPACE]._staticAssetRegistry, and will add
+  // properties and methods there.
+  namespace : 'BV',
 
-// You must set a base URL for the SDK; it will request files
-// using this URL. Files hosted at this URL will be expected to
-// define individual resources by wrapping them in a function that
-// corresponds with the namespace set above:
-//
-// BV._staticAssetRegistry.define(
-//  'jquery-bv@1.1.1', {
-//    // ...
-//  });
-staticAssets.setBaseURL('https://display.ugc.bazaarvoice.com/common/static-assets/');
+  // You must set a base URL for the SDK; it will request files
+  // using this URL. Files hosted at this URL will be expected to
+  // define individual resources by wrapping them in a function that
+  // corresponds with the namespace set above:
+  //
+  // (function (define) {
+  //   define('jquery-bv@1.1.1', function () {
+  //     // ...
+  //     return jQuery;
+  //   });
+  //  
+  //   define('backbone@1.2.0', [
+  //     'jquery-bv@1.11.1',
+  //     'lodash-bv@1.2.0'
+  //   ], function ($, _) {
+  //     // ...
+  //     return Backbone;
+  //   });
+  // }(window.BV._staticAssetRegistry.define));
+  baseUrl : 'https://display.ugc.bazaarvoice.com/common/static-assets/1/'
+});
 
 // Indicate the assets you require.
 staticAssets.require([
+  'underscore@1.0.0',
   'jquery-bv@1.11.1',
   'backbone@1.2.0'
-], function ($, Backbone) {
+], function (_, $, Backbone) {
   // This function will be called when all of the
   // required assets have been resolved.
-})
+});
 ```
+
+**Note:** If you request an asset that has dependencies -- for example, Backbone has a dependency on jQuery and Underscore/Lodash -- you *must* either request those dependencies in the same `require` call, or `define` them (see below) prior to your `require` call.
 
 ### Providing resources
 
@@ -47,7 +71,7 @@ Applications that ship with resources that might be useful to other applications
 ```js
 var staticAssets = require('static-assets/sdk')(scriptLoader);
 staticAssets.setNamespace('BV');
-staticAssets.provide('jquery-bv@1.11.1', jQuery);
+staticAssets.define('jquery-bv@1.11.1', jQuery);
 ```
 
 ## Usage within BV
@@ -56,6 +80,15 @@ Follow the usage instructions above; you should always set a namespace of `'BV'`
 
 | Environment | Base URL |
 |-------------|------|
-| QA | https://display-qa.ugc.bazaarvoice.com/common/static-assets/ |
-| STG | https://display.ugc.bazaarvoice.com/common/static-assets/ |
-| PROD | https://display.ugc.bazaarvoice.com/common/static-assets/ |
+| QA | https://display-qa.ugc.bazaarvoice.com/common/static-assets/1/ |
+| STG | https://display.ugc.bazaarvoice.com/common/static-assets/1/ |
+| PROD | https://display.ugc.bazaarvoice.com/common/static-assets/1/ |
+
+This repo includes the following resources, which covers Curations and Firebird use cases:
+
+| Asset Name | Dependencies | Description |
+| ---- | ---- | ---- |
+| jquery-bv@1.11.1 | | jQuery 1.11.1 with BV modifications. |
+| backbone-firebird@1.0.0 | jquery-bv@1.11.1, lodash-bv@1.2.0 | Firebird Backbone. |
+| lodash-bv@1.2.0 | | Firebird Lodash. |
+| underscore-bv@1.5.2 | | Curations Underscore. |
