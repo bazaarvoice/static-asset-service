@@ -42,6 +42,4 @@ var promise = generate({
 
 ### About the namespace
 
-The nature of the static asset service is that it requires a global namespace -- that is, a property on `window` -- that it can use to communicate back to the apps that request assets. When generating files, this namespace needs to be known in order to property wrap the individual assets in a callback.
-
-For example, if the specified namespace is `'BV'`, then each asset will be wrapped in a call to `BV._staticAssetRegistry.define()`.
+The nature of the static asset service is that it requires a global namespace -- that is, a property on `window` -- that it can use to communicate back to the apps that request assets. When generating files, this namespace needs to be known in order to properly provide the individual assets to the requesting application.

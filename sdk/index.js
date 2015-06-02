@@ -39,13 +39,11 @@ module.exports = function (config) {
 
   var NS = window[ns] = window[ns] || {};
 
-  NS._staticAssetRegistry = NS._staticAssetRegistry || {
+  var registry = NS._staticAssetRegistry = NS._staticAssetRegistry || {
     requests : {},
     responses : {},
     define : _define
   };
-
-  var registry = NS._staticAssetRegistry;
 
   function makeURL (requests) {
     return baseUrl + requests.sort().join('+') + '.js';
