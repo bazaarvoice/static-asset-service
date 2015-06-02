@@ -123,10 +123,11 @@ module.exports = function (config) {
       }
 
       forEach(assets, function (asset) {
+        var handler = makeHandler(asset);
+
         if (registry.responses[asset]) {
           // There is already a fulfilled request for this asset
-          responses[asset] = registry.responses[asset];
-          callbackIfComplete();
+          handler(registry.responses[asset]);
           return;
         }
 

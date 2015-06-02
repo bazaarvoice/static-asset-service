@@ -7,13 +7,22 @@ function getScript (url) {
   document.body.appendChild(s);
 }
 
-var staticAssets = require('../../sdk')({
+var sdk = require('../../sdk');
+
+var staticAssets1 = sdk({
   loader : getScript,
   namespace : 'TEST',
   baseUrl : 'http://localhost:9999/assets/'
 });
 
-staticAssets.require([
+var staticAssets2 = sdk({
+  loader : getScript,
+  namespace : 'TEST',
+  baseUrl : 'http://localhost:9999/assets/',
+  debug : true
+});
+
+staticAssets1.require([
   'asset-with-dependency@1.0.0',
   'asset-without-dependency@1.0.0'
 ], function (withDependency, withoutDependency) {
@@ -41,7 +50,19 @@ staticAssets.require([
         expect(withoutDependency).to.equal('asset-without-dependency');
       });
     });
+
+    describe('requiring already-required assets', function () {
+      it('should work', function (done) {
+        staticAssets2.require([
+          'asset-without-dependency@1.0.0'
+        ], function (withoutDependency) {
+          expect(withoutDependency).to.equal('asset-without-dependency');
+          done();
+        });
+      });
+    });
   });
+
 
   mocha.run();
 });
