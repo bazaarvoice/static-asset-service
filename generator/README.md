@@ -16,7 +16,7 @@ var promise = generate({
   sourceDir : '/Users/rebecca.murphey/code/static-asset-service/assets',
 
   // The destination where the assets will be created.
-  targetDir : '/Users/rebecca.murphey/code/static-assets/service/dist'
+  targetDir : '/Users/rebecca.murphey/code/static-asset-service/dist'
 
   // The assets that need to be supported for each application.
   // Each asset must have a corresponding file in the assets
