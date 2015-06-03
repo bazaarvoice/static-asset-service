@@ -13,10 +13,10 @@ var promise = generate({
   namespace : 'BV',
 
   // The directory where the generator can expect to find the asset files.
-  sourceDir : '/Users/rebecca.murphey/code/static-asset-service/assets',
+  sourceDir : '/some/path/assets',
 
   // The destination where the assets will be created.
-  targetDir : '/Users/rebecca.murphey/code/static-asset-service/dist'
+  targetDir : '/some/path/dist',
 
   // The assets that need to be supported for each application.
   // Each asset must have a corresponding file in the assets
