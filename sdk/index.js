@@ -46,7 +46,7 @@ module.exports = function (config) {
   };
 
   function makeURL (requests) {
-    return baseUrl + requests.sort().join('+') + '.js';
+    return baseUrl + encodeURIComponent(requests.sort().join('+')) + '.js';
   }
 
   function _define (name, deps, value) {

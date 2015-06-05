@@ -22,4 +22,16 @@ Developers should run `npm install` before doing any work on this repository. Th
 
 ## Deploying the generated asset files
 
-*Not yet implemented.*
+Presently, you must have AWS keys for the Conversations AWS account in order to perform a deployment. (In the future, this may use a Nexus bucket instead.) Assuming that you have properly exported the required AWS environment variables, you can then run the following:
+
+```
+grunt deploy
+```
+
+This will build the files for distribution, then deploy them to *all hosts*. You can specify a single host:
+
+```
+grunt deploy:$environment
+```
+
+The `$environment` value must be `test`, `qa`, or `prod`.
