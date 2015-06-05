@@ -2,6 +2,8 @@
 
 var path = require('path');
 
+var semver = require('semver');
+
 var dependencies = {
   firebird : [
     'jquery-bv@1.11.1',
@@ -10,19 +12,54 @@ var dependencies = {
   ],
   curations : [
     'jquery-bv@1.11.1',
-    'underscore@1.5.2'
-  ],
-  spotlights : [
-    'backbone-bv@1.2.0',
-    'lodash@2.4.1'
+    'underscore-bv@1.5.2'
   ]
 };
 
 module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
 
+  var pkg = grunt.file.readJSON('package.json');
+  var version = pkg.version;
+
+  // Deploy all map and JS files to an s3 bucket in:
+  // - common/static/$major/
+  // - common/static/$major.$minor/
+  // - common/static/$major.$minor.$patch/
+  var s3Files = [{
+    cwd : 'dist',
+    src : [
+      '**/*.js',
+      '**/*.map'
+    ],
+    dest : 'common/static-assets/' +
+      semver.major(version) + '/'
+  },
+  {
+    cwd : 'dist',
+    src : [
+      '**/*.js',
+      '**/*.map'
+    ],
+    dest : 'common/static-assets/' +
+      semver.major(version) + '.' +
+      semver.minor(version) + '/'
+  },
+  {
+    cwd : 'dist',
+    src : [
+      '**/*.js',
+      '**/*.map'
+    ],
+    dest : 'common/static-assets/' +
+      semver.major(version) + '.' +
+      semver.minor(version) + '.' +
+      semver.patch(version) + '/'
+  }];
+
   grunt.initConfig({
-    pkg : grunt.file.readJSON('package.json'),
+    pkg : pkg,
+
     webpack : {
       test : {
         entry : './test/integration/main.js',
@@ -30,6 +67,20 @@ module.exports = function (grunt) {
           path : './test/scratch/',
           filename : 'main.js'
         }
+      }
+    },
+
+    uglify : {
+      options : {
+        sourceMap : true
+      },
+      dist : {
+        files : [{
+          expand : true,
+          cwd : 'dist',
+          src : '**/*.js',
+          dest : 'dist'
+        }]
       }
     },
 
@@ -143,6 +194,33 @@ module.exports = function (grunt) {
       test : {
         src : ['test/unit/**/*.js']
       }
+    },
+
+    s3 : {
+      options : {
+        bucket : 'origin-bvfirebird-display-test',
+        headers : {
+          CacheControl : 'max-age=2592000'
+        }
+      },
+      test : {
+        files : s3Files,
+        options : {
+          bucket : 'origin-bvfirebird-display-test'
+        }
+      },
+      qa : {
+        files : s3Files,
+        options : {
+          bucket : 'origin-bvfirebird-display-qa'
+        }
+      },
+      prod : {
+        files : s3Files,
+        options : {
+          bucket : 'origin-bvfirebird-display-prod'
+        }
+      }
     }
   });
 
@@ -165,7 +243,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('dist', [
     'clean:dist',
-    'generate:dist'
+    'generate:dist',
+    'uglify:dist'
   ]);
 
   grunt.registerTask('serve', [
