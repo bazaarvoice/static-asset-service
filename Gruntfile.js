@@ -268,4 +268,25 @@ module.exports = function (grunt) {
   grunt.registerTask('pre-push', [
     'test'
   ]);
+
+  grunt.registerTask('deploy', 'Deploy the assets', function (env) {
+    if (!env) {
+      return grunt.task.run([
+        'dist',
+        's3'
+      ]);
+    }
+
+    if (['prod', 'qa', 'test'].indexOf(env) === -1) {
+      return grunt.fail.fatal('The environment "' +
+        env +
+        '" is not valid. ' +
+        'Valid environments are prod, test, and qa.');
+    }
+
+    grunt.task.run([
+      'dist',
+      's3:' + env
+    ]);
+  });
 };
