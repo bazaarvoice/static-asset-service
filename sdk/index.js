@@ -156,5 +156,7 @@ module.exports = function (config) {
     define : _define
   };
 
+  registry.require = sdk.require;
+
   return sdk;
 };
