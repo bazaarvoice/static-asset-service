@@ -15,7 +15,7 @@ define('lodash-bv@1.2.0', function () {
      * - https://github.com/lodash/lodash/issues/799
      * - https://github.com/jashkenas/underscore/issues/2081
      */
-  ;(function(window) {
+  return (function(window) {
 
     /** Used as a safe reference for `undefined` in pre ES5 environments */
     var undefined;
