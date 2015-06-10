@@ -86,29 +86,56 @@ module.exports = function (config) {
       // The things we need to request.
       var requests = [];
 
-      // How many things we have received.
-      var count = 0;
-
       // This function runs when a dependency arrives.
       function makeHandler (asset) {
         return function (arr) {
           responses[asset] = arr;
-
-          count++;
           callbackIfComplete();
         };
       }
 
       function callbackIfComplete () {
-        if (assets.length !== count) {
+        var found = 0;
+
+        forEach(assets, function (asset) {
+          if (checkDeps(asset)) {
+            found++;
+          }
+        });
+
+        function checkDeps (asset) {
+          var response = registry.responses[asset];
+          var fulfilled = false;
+
+          if (!response) {
+            return false;
+          }
+
+          var deps = response.length === 2 ? response[0] : [];
+
+          if (deps.length === 0) {
+            return true;
+          }
+
+          forEach(deps, function (dep) {
+            fulfilled = checkDeps(dep);
+          });
+
+          return fulfilled;
+        }
+
+        if (assets.length !== found) {
           return;
         }
 
-        callback.apply(null, map(assets, resolveAsset));
+        var result = map(assets, resolveAsset);
+
+        callback.apply(null, result);
       }
 
       function resolveAsset (asset) {
-        var response = responses[asset];
+        var response = registry.responses[asset];
+
         var deps = response[0];
         var fn = response[1];
 
@@ -117,7 +144,9 @@ module.exports = function (config) {
           deps = [];
         }
 
-        return fn.apply(null, map(deps, resolveAsset));
+        var result = map(deps, resolveAsset);
+
+        return result.length ? fn.apply(null, result) : fn();
       }
 
       forEach(assets, function (asset) {
