@@ -3,7 +3,7 @@
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
-define(['lodash-bv@1.2.0', 'jquery-bv@1.11.1'], function( _, jQuery ){
+define('backbone-bv@1.0.0', ['lodash-bv@1.2.0', 'jquery-bv@1.11.1'], function( _, jQuery ){
 
 // BV NOTE: There is a patch below to mitigate against the potential of a global
 // `exports` variable existing in the browser. When updating Backbone, please
