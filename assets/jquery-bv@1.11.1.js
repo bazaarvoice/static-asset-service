@@ -1,4 +1,7 @@
 define('jquery-bv@1.11.1', function () {
+  var module = {
+    exports : {}
+  };
 
   /*!
    * jQuery JavaScript Library v1.11.1
@@ -13,8 +16,7 @@ define('jquery-bv@1.11.1', function () {
    *
    * Date: 2014-05-01T17:42Z
    */
-
-  return (function( global, factory ) {
+  (function( global, factory ) {
 
     // BAZAARVOICE HACKS
     // =================
@@ -10408,9 +10410,9 @@ define('jquery-bv@1.11.1', function () {
 
   }());
 
-  return jQuery;
-
   }));
+  
+  // end jquery
 
-
+  return module.exports;
 });
