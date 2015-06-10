@@ -22,10 +22,10 @@ function map (arr, fn) {
 
 module.exports = function (config) {
   var scriptLoader = config.loader;
-  var ns = config.namespace;
+  var NS = config.namespace;
   var baseUrl = config.baseUrl;
 
-  if (!ns) {
+  if (!NS) {
     throw new Error('Cannot initialize SDK without a namespace');
   }
 
@@ -36,8 +36,6 @@ module.exports = function (config) {
   if (!scriptLoader) {
     throw new Error('Cannot initialize SDK without a script loader');
   }
-
-  var NS = window[ns] = window[ns] || {};
 
   var registry = NS._staticAssetRegistry = NS._staticAssetRegistry || {
     requests : {},
