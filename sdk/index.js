@@ -1,5 +1,9 @@
 'use strict';
 
+// TODO: figure out how to not have to hard-code this, without including
+// all of the package.json in this file via require().
+var VERSION = '0.0.2';
+
 function forEach (arr, fn) {
   if (!arr) {
     return;
@@ -20,24 +24,28 @@ function map (arr, fn) {
   return ret;
 }
 
+var hosts = {
+  test : 'display-test.ugc.bazaarvoice.com',
+  prod : 'display.ugc.bazaarvoice.com',
+  stg : 'display.ugc.bazaarvoice.com'
+};
+
 module.exports = function (config) {
   var scriptLoader = config.loader;
-  var ns = config.namespace;
-  var baseUrl = config.baseUrl;
+  var NS = config.namespace;
+  var env = config.env || 'prod';
+  var baseUrl = config.baseUrl || ('https://' +
+    (hosts[env] || hosts.prod) +
+    '/common/static-assets/' +
+    VERSION + '/');
 
-  if (!ns) {
+  if (!NS) {
     throw new Error('Cannot initialize SDK without a namespace');
-  }
-
-  if (!baseUrl) {
-    throw new Error('Cannot initialize SDK without a baseUrl');
   }
 
   if (!scriptLoader) {
     throw new Error('Cannot initialize SDK without a script loader');
   }
-
-  var NS = window[ns] = window[ns] || {};
 
   var registry = NS._staticAssetRegistry = NS._staticAssetRegistry || {
     requests : {},
@@ -78,31 +86,41 @@ module.exports = function (config) {
      *                             as the provided assets array.
      */
     require : function (assets, callback) {
-      if (!baseUrl) {
-        throw new Error('Base URL must be specified to require assets');
-      }
-
-      // The objects we will actually respond with.
-      var responses = {};
-
-      // The things we need to request.
-      var requests = [];
-
-      // How many things we have received.
-      var count = 0;
-
-      // This function runs when a dependency arrives.
-      function makeHandler (asset) {
-        return function (arr) {
-          responses[asset] = arr;
-
-          count++;
-          callbackIfComplete();
-        };
-      }
+      // Callback is optional; a script that is just priming
+      // the asset cache may choose not to provide a callback.
+      callback = callback || function () {};
 
       function callbackIfComplete () {
-        if (assets.length !== count) {
+        var found = 0;
+
+        forEach(assets, function (asset) {
+          if (checkDeps(asset)) {
+            found++;
+          }
+        });
+
+        function checkDeps (asset) {
+          var response = registry.responses[asset];
+          var fulfilled = false;
+
+          if (!response) {
+            return false;
+          }
+
+          var deps = response.length === 2 ? response[0] : [];
+
+          if (deps.length === 0) {
+            return true;
+          }
+
+          forEach(deps, function (dep) {
+            fulfilled = checkDeps(dep);
+          });
+
+          return fulfilled;
+        }
+
+        if (assets.length !== found) {
           return;
         }
 
@@ -110,7 +128,8 @@ module.exports = function (config) {
       }
 
       function resolveAsset (asset) {
-        var response = responses[asset];
+        var response = registry.responses[asset];
+
         var deps = response[0];
         var fn = response[1];
 
@@ -119,36 +138,40 @@ module.exports = function (config) {
           deps = [];
         }
 
-        return fn.apply(null, map(deps, resolveAsset));
+        var result = map(deps, resolveAsset);
+
+        return result.length ? fn.apply(null, result) : fn();
       }
 
-      forEach(assets, function (asset) {
-        var handler = makeHandler(asset);
+      var assetsToBeRequested = [];
 
+      forEach(assets, function (asset) {
         if (registry.responses[asset]) {
           // There is already a fulfilled request for this asset
-          handler(registry.responses[asset]);
+          callbackIfComplete();
           return;
         }
 
         if (registry.requests[asset]) {
           // There is already a pending request for this asset.
           // We want to be notified when that request completes.
-          registry.requests[asset].push(makeHandler(asset));
+          registry.requests[asset].push(callbackIfComplete);
           return;
         }
 
         // There is no pending request; we need to register our
         // interest in the asset, and queue it for requesting.
-        registry.requests[asset] = [ makeHandler(asset) ];
+        registry.requests[asset] = [ callbackIfComplete ];
 
-        requests.push(asset);
+        assetsToBeRequested.push(asset);
       });
 
       // If we queued any requests, now we need to make them.
-      if (requests.length) {
-        scriptLoader(makeURL(requests), function () {
-          throw new Error('Failed to load ' + requests.join(', '));
+      if (assetsToBeRequested.length) {
+        scriptLoader(makeURL(assetsToBeRequested), function (err) {
+          if (err) {
+            throw new Error('Failed to load ' + assetsToBeRequested.join(', '));
+          }
         });
       }
     },

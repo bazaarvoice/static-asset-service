@@ -7,7 +7,6 @@ var semver = require('semver');
 var dependencies = {
   firebird : [
     'jquery-bv@1.11.1',
-    'backbone-bv@1.0.0',
     'lodash-bv@1.2.0'
   ],
   curations : [
@@ -271,9 +270,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', 'Deploy the assets', function (env) {
     if (!env) {
+      grunt.log.write('No environment specified, using test');
+      
       return grunt.task.run([
         'dist',
-        's3'
+        's3:test'
       ]);
     }
 
