@@ -7,17 +7,19 @@ function getScript (url) {
   document.body.appendChild(s);
 }
 
+window.TEST = {};
+
 var sdk = require('../../sdk');
 
 var staticAssets1 = sdk({
   loader : getScript,
-  namespace : 'TEST',
+  namespace : window.TEST,
   baseUrl : 'http://localhost:9999/assets/'
 });
 
 var staticAssets2 = sdk({
   loader : getScript,
-  namespace : 'TEST',
+  namespace : window.TEST,
   baseUrl : 'http://localhost:9999/assets/',
   debug : true
 });
