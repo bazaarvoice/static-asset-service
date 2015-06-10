@@ -25,9 +25,9 @@ var staticAssets = require('static-assets/sdk')({
   loader : getScript,
 
   // You must set a namespace for the SDK; the SDK will need to
-  // create window[NAMESPACE]._staticAssetRegistry, and will add
+  // create $NAMESPACE._staticAssetRegistry, and will add
   // properties and methods there.
-  namespace : 'BV',
+  namespace : window.BV,
 
   // You must set a base URL for the SDK; it will request files
   // using this URL. Files hosted at this URL will be expected to
@@ -47,7 +47,7 @@ var staticAssets = require('static-assets/sdk')({
   //     // ...
   //     return Backbone;
   //   });
-  // }(window.BV._staticAssetRegistry.define));
+  // }($NAMESPACE._staticAssetRegistry.define));
   baseUrl : 'https://display.ugc.bazaarvoice.com/common/static-assets/1/'
 });
 
@@ -69,14 +69,16 @@ staticAssets.require([
 Applications that ship with resources that might be useful to other applications on the page can provide those resources via the SDK:
 
 ```js
-var staticAssets = require('static-assets/sdk')(scriptLoader);
-staticAssets.setNamespace('BV');
+var staticAssets = require('static-assets/sdk')({
+  // see above for required options
+});
+
 staticAssets.define('jquery-bv@1.11.1', jQuery);
 ```
 
 ## Usage within BV
 
-Follow the usage instructions above; you should always set a namespace of `'BV'`, and set a base URL based on the environment in which you are running:
+Follow the usage instructions above; you should always set a namespace of `window.BV`, and set a base URL based on the environment in which you are running:
 
 | Environment | Base URL |
 |-------------|------|
@@ -89,6 +91,5 @@ This repo includes the following resources, which covers Curations and Firebird 
 | Asset Name | Dependencies | Description |
 | ---- | ---- | ---- |
 | jquery-bv@1.11.1 | | jQuery 1.11.1 with BV modifications. |
-| backbone-firebird@1.0.0 | jquery-bv@1.11.1, lodash-bv@1.2.0 | Firebird Backbone. |
 | lodash-bv@1.2.0 | | Firebird Lodash. |
 | underscore-bv@1.5.2 | | Curations Underscore. |
