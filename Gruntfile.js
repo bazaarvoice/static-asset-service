@@ -7,7 +7,6 @@ var semver = require('semver');
 var dependencies = {
   firebird : [
     'jquery-bv@1.11.1',
-    'backbone-bv@1.0.0',
     'lodash-bv@1.2.0'
   ],
   curations : [
