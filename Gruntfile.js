@@ -270,9 +270,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', 'Deploy the assets', function (env) {
     if (!env) {
+      grunt.log.write('No environment specified, using test');
+      
       return grunt.task.run([
         'dist',
-        's3'
+        's3:test'
       ]);
     }
 
