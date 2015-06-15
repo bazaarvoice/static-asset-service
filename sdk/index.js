@@ -1,5 +1,9 @@
 'use strict';
 
+// TODO: figure out how to not have to hard-code this, without including
+// all of the package.json in this file via require().
+var VERSION = '0.0.2';
+
 function forEach (arr, fn) {
   if (!arr) {
     return;
@@ -20,17 +24,23 @@ function map (arr, fn) {
   return ret;
 }
 
+var hosts = {
+  test : 'display-test.ugc.bazaarvoice.com',
+  prod : 'display.ugc.bazaarvoice.com',
+  stg : 'display.ugc.bazaarvoice.com'
+};
+
 module.exports = function (config) {
   var scriptLoader = config.loader;
   var NS = config.namespace;
-  var baseUrl = config.baseUrl;
+  var env = config.env || 'prod';
+  var baseUrl = 'https://' +
+    (hosts[env] || hosts['prod']) +
+    '/common/static-assets/' +
+    VERSION + '/';
 
   if (!NS) {
     throw new Error('Cannot initialize SDK without a namespace');
-  }
-
-  if (!baseUrl) {
-    throw new Error('Cannot initialize SDK without a baseUrl');
   }
 
   if (!scriptLoader) {

@@ -29,26 +29,10 @@ var staticAssets = require('static-assets/sdk')({
   // properties and methods there.
   namespace : window.BV,
 
-  // You must set a base URL for the SDK; it will request files
-  // using this URL. Files hosted at this URL will be expected to
-  // define individual resources by wrapping them in a function that
-  // corresponds with the namespace set above:
-  //
-  // (function (define) {
-  //   define('jquery-bv@1.1.1', function () {
-  //     // ...
-  //     return jQuery;
-  //   });
-  //  
-  //   define('backbone@1.2.0', [
-  //     'jquery-bv@1.11.1',
-  //     'lodash-bv@1.2.0'
-  //   ], function ($, _) {
-  //     // ...
-  //     return Backbone;
-  //   });
-  // }($NAMESPACE._staticAssetRegistry.define));
-  baseUrl : 'https://display.ugc.bazaarvoice.com/common/static-assets/1/'
+  // You can specify an environment for the static asset service;
+  // if you do not specify one, or if the one you specify is invalid,
+  // it will use the prod environment. Valid values are prod, qa, and test.
+  env : 'prod'
 });
 
 // Indicate the assets you require.
