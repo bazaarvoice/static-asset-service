@@ -34,10 +34,10 @@ module.exports = function (config) {
   var scriptLoader = config.loader;
   var NS = config.namespace;
   var env = config.env || 'prod';
-  var baseUrl = 'https://' +
+  var baseUrl = config.baseUrl || ('https://' +
     (hosts[env] || hosts.prod) +
     '/common/static-assets/' +
-    VERSION + '/';
+    VERSION + '/');
 
   if (!NS) {
     throw new Error('Cannot initialize SDK without a namespace');
