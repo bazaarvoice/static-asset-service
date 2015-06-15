@@ -35,7 +35,7 @@ module.exports = function (config) {
   var NS = config.namespace;
   var env = config.env || 'prod';
   var baseUrl = 'https://' +
-    (hosts[env] || hosts['prod']) +
+    (hosts[env] || hosts.prod) +
     '/common/static-assets/' +
     VERSION + '/';
 
