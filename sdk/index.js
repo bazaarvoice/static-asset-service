@@ -2,7 +2,7 @@
 
 // TODO: figure out how to not have to hard-code this, without including
 // all of the package.json in this file via require().
-var VERSION = '0.0.2';
+var VERSION = '1.0.0';
 
 function forEach (arr, fn) {
   if (!arr) {
