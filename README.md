@@ -6,6 +6,8 @@ This repository supports a static asset service:
 - [Generator](./generator/README.md): A tool for generating the compiled asset files, used to power the `grunt dist` task.
 - [Assets](./assets/README.md): The assets that the service provides.
 
+The original idea for this repo was [documented in a gist](https://gist.github.com/rmurphey/6842b3b1b806dd123676).
+
 ## Getting started
 
 Developers should run `npm install` before doing any work on this repository. This will install the project dependencies, as well as a pre-push hook.
