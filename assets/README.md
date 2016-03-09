@@ -1,31 +1,20 @@
 # Assets
 
-This directory contains the assets that are provided by the service.
+This directory contains the assets provided by the static asset service.
 
-## File names
+## File Names
 
-Files must be named as `<resource>@<version>.js`.
+Asset files must have names in the format: `<resource>@<version>.js`.
 
-## File contents
+## File Contents
 
-Files should contain valid JavaScript, structured as follows:
+Asset files should contain valid JavaScript, structured as follows:
 
 ```js
 define('<resource>@<version>', function () {
-  // ...
-  return resource;
-});
-```
 
-Files with dependencies must specify those dependencies, including the
-specific version required:
-
-```js
-define('<resource>@<version>', [
-  'dependencyA@1.0.0',
-  'dependencyB@1.1.1'
-], function (dependencyA, dependencyB) {
   // ...
+
   return resource;
 });
 ```

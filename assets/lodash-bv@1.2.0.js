@@ -1,4 +1,4 @@
-define('lodash-bv@1.2.0', function () {
+define('lodash-bv@1.2.0', (function () {
   /**
    * @license
    * Lo-Dash 1.2.0 (Custom Build) <http://lodash.com/>
@@ -4413,4 +4413,4 @@ define('lodash-bv@1.2.0', function () {
 
     return lodash;
   }(this));
-});
+})());

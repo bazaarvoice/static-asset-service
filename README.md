@@ -1,39 +1,51 @@
 # Static Asset Service
 
-This repository supports a static asset service:
+This repository supports the generator and assets for a static asset service:
 
-- [Client-Side SDK](./sdk/README.md): A tool for client-side applications to use to request assets from the service, to be included in an application's scout file.
-- [Generator](./generator/README.md): A tool for generating the compiled asset files, used to power the `grunt dist` task.
-- [Assets](./assets/README.md): The assets that the service provides.
+- [Generator](./generator): A tool for generating compiled asset files and
+deploying the files to S3.
+- [Assets](./assets): The assets that the service provides.
 
-The original idea for this repo was [documented in a gist](https://gist.github.com/rmurphey/6842b3b1b806dd123676).
+The static asset client that is used to require and define assets in a
+Javascript browser application is defined [in the bv-ui-core repository][2].
 
-## Getting started
+The original idea for this repo was [documented in a gist][1].
 
-Developers should run `npm install` before doing any work on this repository. This will install the project dependencies, as well as a pre-push hook.
+## Getting Started
 
-## Running the tests
+Developers should run `npm install` before doing any work on this repository.
+This will install the project dependencies, as well as a pre-push hook.
 
-`grunt test` will run the browser tests using PhantomJS, as well as ESLint and the tests of the generator code.
+## Running the Tests
+
+`grunt test` will run the browser tests using PhantomJS, as well as ESLint and
+the tests of the generator code.
 
 `grunt serve` will open a browser to show the browser tests.
 
-## Generating the asset files
+## Generating the Asset Files
 
 `grunt dist` will generate the files in the dist directory of the repo.
 
-## Deploying the generated asset files
+## Deploying the Generated Asset Files
 
-Presently, you must have AWS keys for the Conversations AWS account in order to perform a deployment. (In the future, this may use a Nexus bucket instead.) Assuming that you have properly exported the required AWS environment variables, you can then run the following:
+Presently, you must have AWS keys for the Conversations AWS account in order to
+perform a deployment. (In the future, this may use a Nexus bucket instead).
+Assuming that you have properly exported the required AWS environment variables,
+you can then run the following:
 
 ```
 grunt deploy
 ```
 
-This will build the files for distribution, then deploy them to *all hosts*. You can specify a single host:
+This will build the files for distribution, then deploy them to *all hosts*. You
+can specify a single host:
 
 ```
-grunt deploy:$environment
+grunt deploy:<environment>
 ```
 
-The `$environment` value must be `test`, `qa`, or `prod`.
+The `<environment>` value must be `test`, `qa`, or `prod`.
+
+[1]: https://gist.github.com/rmurphey/6842b3b1b806dd123676
+[2]: https://github.com/bazaarvoice/bv-ui-core/tree/master/lib/staticAssetLoader

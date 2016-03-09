@@ -1,59 +1,45 @@
 {
-    "env": {
-        "browser" : true,
-        "node": true
-    },
-    "ecmaFeatures" : {
-        "jsx": true
-    },
-    "rules": {
-        "bitwise": true,
-        "curly": true,
-        "eqeqeq": true,
-        "forin": true,
-        "immed": true,
-        "latedef": true,
-        "newcap": true,
-        "noarg": true,
-        "noempty": true,
-        "nonew": false,
-        "plusplus": false,
-        "regexp": true,
-        "undef": true,
-        "trailing": true,
-        "quotes": [2, "single"],
-
-        "key-spacing": [2, {
-            "beforeColon": true,
-            "afterColon": true
-        }],
-
-        "no-shadow": false,
-        "no-use-before-define": false,
-
-        "asi": false,
-        "debug": true,
-        "global-strict": [2, "always"],
-        "smarttabs": true,
-        "browser": true,
-        "devel": true,
-        "jquery": true,
-        "node": true,
-        "expr": true,
-        "no-underscore-dangle": false,
-
-        "indent": [2, 2],
-        "brace-style": [2, "stroutstrup", {
-            "allowSingleLine" : true
-        }],
-        "space-after-keywords": [2, "always"],
-        "space-before-function-paren": 2,
-        "space-before-blocks": 2
-    },
-    "globals": {
-        "$": true,
-        "Modernizr": true,
-        "jQuery": true,
-        "__dirname": true
-    }
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "$": true,
+    "Modernizr": true,
+    "jQuery": true,
+    "__dirname": true
+  },
+  "rules": {
+    "brace-style": [2, "stroustrup", { "allowSingleLine": true }],
+    "consistent-return": 0,
+    "curly": 2,
+    "eqeqeq": 2,
+    "indent": [2, 2, { "SwitchCase": 1 }],
+    "key-spacing": [2, {
+      "beforeColon": false,
+      "afterColon": true
+    }],
+    "keyword-spacing": [2, {"before": true, "after": true, "overrides": {}}],
+    "no-multiple-empty-lines": 2,
+    "no-throw-literal": 2,
+    "no-underscore-dangle": 0,
+    "no-unused-vars": [2, {
+      "vars": "all",
+      "args": "none"
+    }],
+    "no-use-before-define": [2, "nofunc"],
+    "object-curly-spacing": [2, "always"],
+    "quote-props": [2, "as-needed"],
+    "quotes": [2, "single"],
+    "radix": 2,
+    "space-before-blocks": [2, "always"],
+    "space-before-function-paren": [2, "always"],
+    "space-in-parens": [2, "never"],
+    "space-unary-ops": [2, {
+      "words": true,
+      "nonwords": false
+    }],
+    "strict": [2, "never"],
+    "wrap-iife": [2, "inside"]
+  }
 }

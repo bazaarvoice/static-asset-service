@@ -1,4 +1,4 @@
-define('underscore-bv@1.5.2', function () {
+define('underscore-bv@1.5.2', (function () {
   //     Underscore.js 1.5.2
   //     http://underscorejs.org
   //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -1275,4 +1275,4 @@ define('underscore-bv@1.5.2', function () {
     return _;
 
   }).call(this);
-});
+})());

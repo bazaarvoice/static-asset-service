@@ -1,19 +1,15 @@
-'use strict';
+/**
+ * @fileOverview Grunt configuration.
+ */
 
+// Core.
 var path = require('path');
 
+// NPM.
 var semver = require('semver');
 
-var dependencies = {
-  firebird : [
-    'jquery-bv@1.11.1',
-    'lodash-bv@1.2.0'
-  ],
-  curations : [
-    'jquery-bv@1.11.1',
-    'underscore-bv@1.5.2'
-  ]
-};
+// Local.
+var generator = require('./generator');
 
 module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
@@ -25,163 +21,178 @@ module.exports = function (grunt) {
   // - common/static/$major/
   // - common/static/$major.$minor/
   // - common/static/$major.$minor.$patch/
-  var s3Files = [{
-    cwd : 'dist',
-    src : [
-      '**/*.js',
-      '**/*.map'
-    ],
-    dest : 'common/static-assets/' +
-      semver.major(version) + '/'
-  },
-  {
-    cwd : 'dist',
-    src : [
-      '**/*.js',
-      '**/*.map'
-    ],
-    dest : 'common/static-assets/' +
-      semver.major(version) + '.' +
-      semver.minor(version) + '/'
-  },
-  {
-    cwd : 'dist',
-    src : [
-      '**/*.js',
-      '**/*.map'
-    ],
-    dest : 'common/static-assets/' +
-      semver.major(version) + '.' +
-      semver.minor(version) + '.' +
-      semver.patch(version) + '/'
-  }];
+  var s3Files = [
+    {
+      cwd: 'dist',
+      src: [
+        '**/*.js',
+        '**/*.map'
+      ],
+      dest: 'common/static-assets/' +
+        semver.major(version) + '/'
+    },
+    {
+      cwd: 'dist',
+      src: [
+        '**/*.js',
+        '**/*.map'
+      ],
+      dest: 'common/static-assets/' +
+        semver.major(version) + '.' +
+        semver.minor(version) + '/'
+    },
+    {
+      cwd: 'dist',
+      src: [
+        '**/*.js',
+        '**/*.map'
+      ],
+      dest: 'common/static-assets/' +
+        semver.major(version) + '.' +
+        semver.minor(version) + '.' +
+        semver.patch(version) + '/'
+    }
+  ];
 
   grunt.initConfig({
-    pkg : pkg,
+    pkg: pkg,
 
-    webpack : {
-      test : {
-        entry : './test/integration/main.js',
-        output : {
-          path : './test/scratch/',
-          filename : 'main.js'
+    webpack: {
+      test: {
+        entry: './test/integration/main.js',
+        output: {
+          path: './test/scratch/',
+          filename: 'main.js'
         }
       }
     },
 
-    uglify : {
-      options : {
-        sourceMap : true
+    uglify: {
+      options: {
+        sourceMap: true
       },
-      dist : {
-        files : [{
-          expand : true,
-          cwd : 'dist',
-          src : '**/*.js',
-          dest : 'dist'
+      dist: {
+        files: [{
+          expand: true,
+          cwd: 'dist',
+          src: '**/*.js',
+          dest: 'dist'
         }]
       }
     },
 
-    copy : {
-      test : {
-        files : [
+    copy: {
+      test: {
+        files: [
           {
-            expand : true,
-            cwd : 'test/integration/',
-            src : 'index.html',
-            dest : 'test/scratch/'
+            expand: true,
+            cwd: 'test/integration/',
+            src: 'index.html',
+            dest: 'test/scratch/'
           },
           {
-            expand : true,
-            cwd : 'node_modules',
-            src : 'mocha/mocha.*',
-            dest : 'test/scratch/'
+            expand: true,
+            cwd: 'node_modules',
+            src: 'mocha/mocha.*',
+            dest: 'test/scratch/'
           },
           {
-            expand : true,
-            cwd : 'node_modules',
-            src : 'chai/chai.js',
-            dest : 'test/scratch/'
+            expand: true,
+            cwd: 'node_modules',
+            src: 'chai/chai.js',
+            dest: 'test/scratch/'
+          },
+          {
+            expand: true,
+            cwd: 'node_modules',
+            src: 'sinon/pkg/sinon.js',
+            dest: 'test/scratch/'
           }
         ]
       }
     },
 
-    clean : {
-      dist : [
+    clean: {
+      dist: [
         'dist'
       ],
-      test : ['test/scratch']
+      test: ['test/scratch']
     },
 
-    eslint : {
-      target : [
+    eslint: {
+      target: [
         'lib/**/*.js',
-        'sdk/**/*.js',
         'test/**/*.js',
         '!test/scratch/**/*',
         '!test/fixtures/assets/**/*'
       ]
     },
 
-    generate : {
-      dist : {
-        src : path.resolve(__dirname, 'assets'),
-        dest : path.resolve(__dirname, 'dist'),
-        deps : dependencies,
-        namespace : 'BV'
-      },
-      test : {
-        src : path.resolve(__dirname, 'test/fixtures/assets'),
-        dest : path.resolve(__dirname, 'test/scratch/assets'),
-        deps : {
-          app : [
-            'asset-with-dependency@1.0.0',
-            'asset-without-dependency@1.0.0'
+    generate: {
+      dist: {
+        sourceDir: path.resolve(__dirname, 'assets'),
+        targetDir: path.resolve(__dirname, 'dist'),
+        assetBundles: {
+          firebird: [
+            'jquery-bv@1.11.1',
+            'lodash-bv@1.2.0'
+          ],
+          curations: [
+            'jquery-bv@1.11.1',
+            'underscore-bv@1.5.2'
           ]
         },
-        namespace : 'TEST'
+        namespaceName: 'BV'
+      },
+      test: {
+        sourceDir: path.resolve(__dirname, 'test/fixtures/assets'),
+        targetDir: path.resolve(__dirname, 'test/scratch/assets'),
+        assetBundles: {
+          app: [
+            'asset-one@1.0.0',
+            'asset-two@1.0.0'
+          ]
+        },
+        namespaceName: 'TEST'
       }
     },
 
-    connect : {
-      serve : {
-        options : {
-          port : 9999,
-          base : 'test/scratch',
-          open : 'http://localhost:9999/index.html',
-          livereload : true
+    connect: {
+      serve: {
+        options: {
+          port: 9999,
+          base: 'test/scratch',
+          open: 'http://localhost:9999/index.html',
+          livereload: true
         }
       },
-      test : {
-        options : {
-          port : 9999,
-          base : 'test/scratch'
+      test: {
+        options: {
+          port: 9999,
+          base: 'test/scratch'
         }
       }
     },
 
-    watch : {
-      test : {
-        files : [
+    watch: {
+      test: {
+        files: [
           'lib/**/*.js',
           'assets/**/*.js',
-          'sdk/**/*.js',
           'test/**/*'
         ],
-        tasks : ['webpack:test'],
-        options : {
-          livereload : true
+        tasks: ['webpack:test'],
+        options: {
+          livereload: true
         }
       }
     },
 
-    // PhantomJS tests of SDK
-    mocha : {
-      all : {
-        options : {
-          urls : [
+    // PhantomJS tests.
+    mocha: {
+      all: {
+        options: {
+          urls: [
             'http://localhost:9999/index.html'
           ]
         }
@@ -189,55 +200,44 @@ module.exports = function (grunt) {
     },
 
     // Server-side tests of generator
-    mochaTest : {
-      test : {
-        src : ['test/unit/**/*.js']
+    mochaTest: {
+      test: {
+        src: ['test/unit/**/*.spec.js']
       }
     },
 
-    s3 : {
-      options : {
-        bucket : 'origin-bvfirebird-display-test',
-        headers : {
-          CacheControl : 'max-age=2592000'
+    s3: {
+      options: {
+        bucket: 'origin-bvfirebird-display-test',
+        headers: {
+          CacheControl: 'max-age=2592000'
         }
       },
-      test : {
-        files : s3Files,
-        options : {
-          bucket : 'origin-bvfirebird-display-test'
+      test: {
+        files: s3Files,
+        options: {
+          bucket: 'origin-bvfirebird-display-test'
         }
       },
-      qa : {
-        files : s3Files,
-        options : {
-          bucket : 'origin-bvfirebird-display-qa'
+      qa: {
+        files: s3Files,
+        options: {
+          bucket: 'origin-bvfirebird-display-qa'
         }
       },
-      prod : {
-        files : s3Files,
-        options : {
-          bucket : 'origin-bvfirebird-display-prod'
+      prod: {
+        files: s3Files,
+        options: {
+          bucket: 'origin-bvfirebird-display-prod'
         }
       }
     }
   });
 
   grunt.registerMultiTask('generate', function () {
-    var generate = require('./generator');
     var done = this.async();
 
-    generate({
-      dependencies : this.data.deps,
-      sourceDir : this.data.src,
-      targetDir : this.data.dest,
-      namespace : this.data.namespace
-    }).then(function () {
-      done();
-    }, function (err) {
-      grunt.log.error(err);
-      done(false);
-    });
+    generator(this.data).then(done, done);
   });
 
   grunt.registerTask('dist', [
@@ -271,7 +271,7 @@ module.exports = function (grunt) {
   grunt.registerTask('deploy', 'Deploy the assets', function (env) {
     if (!env) {
       grunt.log.write('No environment specified, using test');
-      
+
       return grunt.task.run([
         'dist',
         's3:test'
