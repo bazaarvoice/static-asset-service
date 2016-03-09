@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>static assets service test page</title>
+    <title>Static Assets Service Test Page</title>
     <link rel="stylesheet" href="../mocha/mocha.css">
   </head>
   <body>
@@ -9,12 +9,15 @@
 
     <script src="../mocha/mocha.js"></script>
     <script src="../chai/chai.js"></script>
+    <script src="../sinon/pkg/sinon.js"></script>
 
     <script>
-    mocha.setup('bdd');
+      mocha.setup('bdd');
     </script>
 
-    <!-- load the built main.js that uses the sdk -->
+    <!--
+      Load the built main.js that uses the bv-ui-core static asset loaer.
+    -->
     <script src="../main.js"></script>
   </body>
 </html>

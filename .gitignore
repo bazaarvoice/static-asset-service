@@ -1,5 +1,12 @@
-node_modules/
+# Build and test.
 dist/
 test/scratch/
+test/unit/scratch/
+
+# Sublime Text
+*.sublime-*
+
+# Node.js / NPM.
+node_modules/
 npm-debug.log
 .npm

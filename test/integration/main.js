@@ -1,70 +1,75 @@
-/* global describe:false, chai:false, mocha:false, it:false */
-'use strict';
+/* global afterEach: false, beforeEach: false, describe:false, chai:false, sinon: false, mocha:false, it:false */
+/**
+ * @fileOverview Integration tests.
+ */
 
-function getScript (url) {
-  var s = document.createElement('script');
-  s.src = url;
-  document.body.appendChild(s);
+var staticAssetLoaderFactory = require('bv-ui-core/lib/staticAssetLoader');
+var loader = require('bv-ui-core/lib/loader');
+
+var expect = chai.expect;
+var namespaceName = 'TEST';
+var staticAssetLoader = staticAssetLoaderFactory.create({
+  generateUrl: generateUrl,
+  namespaceName: namespaceName
+});
+
+function generateUrl (assetNames, namespaceName) {
+  var filename = encodeURIComponent(assetNames.slice(0).sort().join('+')) + '.js';
+  // Not using this here.
+  //namespaceName = encodeURIComponent(namespaceName);
+  return 'http://localhost:9999/assets/' + filename;
 }
 
-window.TEST = {};
+staticAssetLoader.require([
+  'asset-one@1.0.0',
+  'asset-two@1.0.0'
+], function (assetOne, assetTwo) {
+  var sandbox;
 
-var sdk = require('../../sdk');
+  beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+  });
 
-var staticAssets1 = sdk({
-  loader : getScript,
-  namespace : window.TEST,
-  baseUrl : 'http://localhost:9999/assets/'
-});
-
-var staticAssets2 = sdk({
-  loader : getScript,
-  namespace : window.TEST,
-  baseUrl : 'http://localhost:9999/assets/',
-  debug : true
-});
-
-staticAssets1.require([
-  'asset-with-dependency@1.0.0',
-  'asset-without-dependency@1.0.0'
-], function (withDependency, withoutDependency) {
-  var expect = chai.expect;
+  afterEach(function () {
+    sandbox.restore();
+  });
 
   describe('integration', function () {
     describe('asset with dependency', function () {
       it('executes the module code', function () {
-        expect(document.getElementById('div2').innerHTML).
-          to.equal('asset-with-dependency');
+        expect(document.getElementById('div2').innerHTML).to.equal('asset-one');
       });
 
       it('exports the proper module', function () {
-        expect(withDependency.it).to.equal('works');
+        expect(assetOne.it).to.equal('works');
       });
 
       it('receives its dependency', function () {
-        expect(document.getElementById('div1').innerHTML).
-          to.equal('asset-without-dependency');
+        expect(document.getElementById('div1').innerHTML).to.equal('testing');
       });
     });
 
     describe('asset without dependency', function () {
       it('exports the proper module', function () {
-        expect(withoutDependency).to.equal('asset-without-dependency');
+        expect(assetTwo).to.equal('asset-two');
       });
     });
 
     describe('requiring already-required assets', function () {
-      it('should work', function (done) {
-        staticAssets2.require([
-          'asset-without-dependency@1.0.0'
-        ], function (withoutDependency) {
-          expect(withoutDependency).to.equal('asset-without-dependency');
+      it('works without making another request to load the asset', function (done) {
+        sandbox.stub(loader, 'loadScript');
+
+        staticAssetLoader.require([
+          'asset-two@1.0.0'
+        ], function (assetTwo) {
+          expect(assetTwo).to.equal('asset-two');
+          sinon.assert.notCalled(loader.loadScript);
+
           done();
         });
       });
     });
   });
-
 
   mocha.run();
 });
