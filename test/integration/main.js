@@ -3,6 +3,7 @@
  * @fileOverview Integration tests.
  */
 
+// NPM.
 var staticAssetLoaderFactory = require('bv-ui-core/lib/staticAssetLoader');
 var loader = require('bv-ui-core/lib/loader');
 

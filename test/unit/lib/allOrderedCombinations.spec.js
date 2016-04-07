@@ -1,10 +1,6 @@
-/* global describe, it */
 /**
  * @fileOverview Unit tests for lib/allOrderedCombinations.
  */
-
-// Core.
-var assert = require('assert');
 
 // Local.
 var allOrderedCombinations = require('../../../lib/allOrderedCombinations');
@@ -23,6 +19,6 @@ describe('lib/allOrderedCombinations', function () {
     ];
     var actual = allOrderedCombinations(assetNames);
 
-    assert.deepEqual(actual, expected);
+    expect(actual).to.eql(expected);
   });
 });

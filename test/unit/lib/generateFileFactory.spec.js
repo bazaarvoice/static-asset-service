@@ -31,17 +31,22 @@ describe('lib/generateFileFactory', function () {
       'asset-one@1.0.0',
       'asset-two@1.0.0'
     ];
+    var uglify = true;
+    var log = false;
 
-    var generateFile = generateFileFactory(assetDir, targetDir, namespaceName);
-
-    generateFile(assetNames).then(
-      function () {
-        // Will throw if the file doesn't exist.
-        fs.statSync(path.resolve(targetDir, assetNames.join('+') + '.js'));
-        done();
-      },
-      done
+    var generateFile = generateFileFactory(
+      assetDir,
+      targetDir,
+      namespaceName,
+      uglify,
+      log
     );
+
+    generateFile(assetNames, function (error) {
+      // Will throw if the file doesn't exist.
+      fs.statSync(path.resolve(targetDir, assetNames.join('+') + '.js'));
+      done(error);
+    });
 
   });
 });
