@@ -5,58 +5,20 @@
 // Core.
 var path = require('path');
 
-// NPM.
-var semver = require('semver');
-
 // Local.
-var generator = require('./generator');
+var generator = require('./lib/generate');
 
 module.exports = function (grunt) {
-  require('load-grunt-tasks')(grunt);
-
-  var pkg = grunt.file.readJSON('package.json');
-  var version = pkg.version;
-
-  // Deploy all map and JS files to an s3 bucket in:
-  // - common/static/$major/
-  // - common/static/$major.$minor/
-  // - common/static/$major.$minor.$patch/
-  var s3Files = [
-    {
-      cwd: 'dist',
-      src: [
-        '**/*.js',
-        '**/*.map'
-      ],
-      dest: 'common/static-assets/' +
-        semver.major(version) + '/'
-    },
-    {
-      cwd: 'dist',
-      src: [
-        '**/*.js',
-        '**/*.map'
-      ],
-      dest: 'common/static-assets/' +
-        semver.major(version) + '.' +
-        semver.minor(version) + '/'
-    },
-    {
-      cwd: 'dist',
-      src: [
-        '**/*.js',
-        '**/*.map'
-      ],
-      dest: 'common/static-assets/' +
-        semver.major(version) + '.' +
-        semver.minor(version) + '.' +
-        semver.patch(version) + '/'
-    }
-  ];
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-webpack');
 
   grunt.initConfig({
-    pkg: pkg,
-
     webpack: {
       test: {
         entry: './test/integration/main.js',
@@ -64,20 +26,6 @@ module.exports = function (grunt) {
           path: './test/scratch/',
           filename: 'main.js'
         }
-      }
-    },
-
-    uglify: {
-      options: {
-        sourceMap: true
-      },
-      dist: {
-        files: [{
-          expand: true,
-          cwd: 'dist',
-          src: '**/*.js',
-          dest: 'dist'
-        }]
       }
     },
 
@@ -113,9 +61,6 @@ module.exports = function (grunt) {
     },
 
     clean: {
-      dist: [
-        'dist'
-      ],
       test: ['test/scratch']
     },
 
@@ -129,21 +74,6 @@ module.exports = function (grunt) {
     },
 
     generate: {
-      dist: {
-        sourceDir: path.resolve(__dirname, 'assets'),
-        targetDir: path.resolve(__dirname, 'dist'),
-        assetBundles: {
-          firebird: [
-            'jquery-bv@1.11.1',
-            'lodash-bv@1.2.0'
-          ],
-          curations: [
-            'jquery-bv@1.11.1',
-            'underscore-bv@1.5.2'
-          ]
-        },
-        namespaceName: 'BV'
-      },
       test: {
         sourceDir: path.resolve(__dirname, 'test/fixtures/assets'),
         targetDir: path.resolve(__dirname, 'test/scratch/assets'),
@@ -153,7 +83,8 @@ module.exports = function (grunt) {
             'asset-two@1.0.0'
           ]
         },
-        namespaceName: 'TEST'
+        namespaceName: 'TEST',
+        uglify: true
       }
     },
 
@@ -201,35 +132,16 @@ module.exports = function (grunt) {
 
     // Server-side tests of generator
     mochaTest: {
+      options: {
+        reporter: 'spec',
+        quiet: false,
+        clearRequireCache: false,
+        require: [
+          path.join(__dirname, 'test/unit/mochaInit.js')
+        ]
+      },
       test: {
         src: ['test/unit/**/*.spec.js']
-      }
-    },
-
-    s3: {
-      options: {
-        bucket: 'origin-bvfirebird-display-test',
-        headers: {
-          CacheControl: 'max-age=2592000'
-        }
-      },
-      test: {
-        files: s3Files,
-        options: {
-          bucket: 'origin-bvfirebird-display-test'
-        }
-      },
-      qa: {
-        files: s3Files,
-        options: {
-          bucket: 'origin-bvfirebird-display-qa'
-        }
-      },
-      prod: {
-        files: s3Files,
-        options: {
-          bucket: 'origin-bvfirebird-display-prod'
-        }
       }
     }
   });
@@ -237,16 +149,11 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('generate', function () {
     var done = this.async();
 
-    generator(this.data).then(done, done);
+    generator(this.data, done);
   });
 
-  grunt.registerTask('dist', [
-    'clean:dist',
-    'generate:dist',
-    'uglify:dist'
-  ]);
-
   grunt.registerTask('serve', [
+    'clean:test',
     'webpack:test',
     'generate:test',
     'copy:test',
@@ -256,6 +163,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'eslint',
+    'clean:test',
     'webpack:test',
     'generate:test',
     'copy:test',
@@ -267,27 +175,4 @@ module.exports = function (grunt) {
   grunt.registerTask('pre-push', [
     'test'
   ]);
-
-  grunt.registerTask('deploy', 'Deploy the assets', function (env) {
-    if (!env) {
-      grunt.log.write('No environment specified, using test');
-
-      return grunt.task.run([
-        'dist',
-        's3:test'
-      ]);
-    }
-
-    if (['prod', 'qa', 'test'].indexOf(env) === -1) {
-      return grunt.fail.fatal('The environment "' +
-        env +
-        '" is not valid. ' +
-        'Valid environments are prod, test, and qa.');
-    }
-
-    grunt.task.run([
-      'dist',
-      's3:' + env
-    ]);
-  });
 };
