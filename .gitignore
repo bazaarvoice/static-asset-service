@@ -3,6 +3,9 @@ dist/
 test/scratch/
 test/unit/scratch/
 
+# Webstorm
+.idea
+
 # Sublime Text
 *.sublime-*
 
