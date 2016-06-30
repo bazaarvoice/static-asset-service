@@ -8,6 +8,7 @@ var path = require('path');
 
 // NPM.
 var fs = require('fs-extra');
+var zlib = require('zlib');
 
 // Local.
 var generateFileFactory = require('../../../lib/generateFileFactory');
@@ -21,7 +22,7 @@ describe('lib/generateFileFactory', function () {
   });
 
   afterEach(function () {
-    fs.removeSync(targetDir);
+    //fs.removeSync(targetDir);
   });
 
   it('functions as expected', function (done) {
@@ -48,5 +49,32 @@ describe('lib/generateFileFactory', function () {
       done(error);
     });
 
+  });
+
+  it('can compress assets', function (done) {
+    var assetDir = path.resolve(__dirname, '../../fixtures/assets');
+    var namespaceName = 'TEST';
+    var assetNames = [
+      'asset-one@1.0.0',
+      'asset-two@1.0.0'
+    ];
+    var uglify = true;
+    var log = true;
+    var compress = true;
+
+    var generateFile = generateFileFactory(
+      assetDir,
+      targetDir,
+      namespaceName,
+      uglify,
+      log,
+      compress
+    );
+
+    generateFile(assetNames, function (error) {
+      // Will throw if the file is not gzip.
+      zlib.gunzipSync(fs.readFileSync(path.resolve(targetDir, assetNames.join('+') + '.js')));
+      done(error);
+    });
   });
 });
