@@ -1,6 +1,6 @@
 {
   "name": "static-asset-service",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Tools for supporting a static asset service.",
   "repository": {
     "type": "git",
