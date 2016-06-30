@@ -22,7 +22,7 @@ describe('lib/generateFileFactory', function () {
   });
 
   afterEach(function () {
-    //fs.removeSync(targetDir);
+    fs.removeSync(targetDir);
   });
 
   it('functions as expected', function (done) {
