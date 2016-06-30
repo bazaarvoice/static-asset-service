@@ -75,4 +75,14 @@ describe('lib/uploadToS3', function () {
       done();
     });
   });
+
+  it('sets content-encoding headers when compression is true', function (done) {
+    options.contentEncoding = 'gzip';
+
+    uploadToS3(options, function (error) {
+      var params = uploadToS3.s3Client.putObject.getCall(0).args[0];
+      expect(params.ContentEncoding).to.equal(options.contentEncoding);
+      done(error);
+    });
+  })
 });
